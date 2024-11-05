@@ -1,12 +1,10 @@
 #include "mainheader.hpp"
 
-using namespace std;
+
  
-using namespace std;
-using namespace boost::asio;
- 
-int main(){
-    string puerto;
+int main()
+{
+    std::string puerto;
     int baudrate;
     int datos;
     char paridad;
@@ -14,20 +12,20 @@ int main(){
  
     try{
         io_context io;
-        cout << "Ingrese nombre del puerto: ";
-        cin >> puerto;
+        std::cout << "Ingrese nombre del puerto: ";
+        std::cin >> puerto;
  
-        cout << "Ingrese baud rate: ";
-        cin >> baudrate;
+        std::cout << "Ingrese baud rate: ";
+        std::cin >> baudrate;
  
-        cout << "Ingrese cantidad de bits de datos: ";
-        cin >> datos;
+        std::cout << "Ingrese cantidad de bits de datos: ";
+        std::cin >> datos;
  
-        cout << "Ingrese paridad (par, impar o ninguno): ";
-        cin >> paridad;
+        std::cout << "Ingrese paridad (par, impar o ninguno): ";
+        std::cin >> paridad;
  
-        cout << "Ingrese cantidad de bits de parada (1 o 2): ";
-        cin >> parada;
+        std::cout << "Ingrese cantidad de bits de parada (1 o 2): ";
+        std::cin >> parada;
  
         serial_port serial(io, puerto);
  
@@ -55,16 +53,16 @@ int main(){
                 break;
         }
  
-        cin.ignore();
+        std::cin.ignore();
  
-        cout << "Conexion establecida" << endl;
+        std::cout << "Conexion establecida" << std::endl;
  
-        string message = "Hola desde Boost.Asio!\r\n";
+        std::string message = "Hola desde Boost.Asio!\r\n";
         write(serial, buffer(message));
  
-        cout << "Mensaje enviado: " << message << endl;
+        std::cout << "Mensaje enviado: " << message << std::endl;
  
-        string comando;
+        std::string comando;
  
         while(true)
         {
@@ -73,8 +71,8 @@ int main(){
             
             
 
-            cout << "Ingrese comandos: ";
-            getline(cin,comando);
+            std::cout << "Ingrese comandos: ";
+            getline(std::cin,comando);
  
             write(serial, buffer(comando));
 
@@ -89,9 +87,9 @@ int main(){
     }    
  
     catch (boost::system::system_error& e) {
-        cerr << "Falla al Establecer Conexion: " << e.what() << endl; //falla al establecer la conexion
+        std::cout << "Falla al Establecer Conexion: " << e.what() << std::endl; //falla al establecer la conexion
     } catch (...) {
-        cerr << "Error en los datos de comunicacion" << endl; //falla al establecer la conexion
+        std::cout << "Error en los datos de comunicacion" << std::endl; //falla al establecer la conexion
     }
  
     return 0;
