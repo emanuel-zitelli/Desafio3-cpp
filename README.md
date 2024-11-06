@@ -18,7 +18,7 @@ Como adicional, y siendo parte de las decisiones tomadas, establecí:
 # Cómo configurar y ejecutar las aplicaciones cliente y servidor.
 
 1. Descargar este repositorio
-2. Dentro de las carpetas Cliente y Servidor se encuentran los ejecutables de cada uno. 
+2. Dentro de las carpetas Cliente y Servidor se encuentran los ejecutables de cada uno. Con tener el emulador para el puerto com3 ya es suficiente.
 2.a El servidor se puede ejecutar y no requiere ninguna configuracion especial.
 
 2.b El cliente pide por pantalla los parámetros de conexión, que el servidor tiene ajustados automáticamente. Son los siguientes:
@@ -29,6 +29,7 @@ Paridad: **n**
 Bits de parada: **1**
 
 Para una comunicación correcta se deben de ingresar estos datos.
+
 
 Si se quiere recompilar los programas, se debe descargar la biblioteca Boost y el emulador VSPE, estableciendo la comunicación serial de tipo com3. El código se compila con el siguiente comando: **g++ -std=c++17 -I "C:/boost_1_86_0" main.cpp functions.cpp  -o main -lws2_32**
 
