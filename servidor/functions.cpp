@@ -70,7 +70,7 @@ void cambiarEstados(Estados* estado, bool esperando, bool ejecucion, bool apagad
 
 //desarrollo para la lectura con timer
 
-//Esta función se activa cuando el deadline_timer alcanza el límite de tiempo sin que la lectura haya finalizado.
+//se llama cuando se alcanzo el tiempo y no hubo lectura.
 void onTimeout(const boost::system::error_code& error, serial_port& serial, bool& running) 
 {
     if (!error) 
@@ -80,7 +80,7 @@ void onTimeout(const boost::system::error_code& error, serial_port& serial, bool
     }
 }
 
-//Esta función se llama cuando la lectura termina ya sea con exito o error
+//Esta función se llama cuando la lectura termina 
 void onRead(const boost::system::error_code& error, size_t len, boost::system::error_code& ec, size_t& length) 
 {
     ec = error;
@@ -89,19 +89,19 @@ void onRead(const boost::system::error_code& error, size_t len, boost::system::e
 
 bool leerConTimeout(serial_port& serial, deadline_timer &timer, io_context &io, char* buffer, size_t buffer_size, boost::system::error_code& ec, int& timeout, bool& running, size_t& length) 
 {
-    ec = error::would_block;    //cada vez que se llama a la funcion reinicializo ec
-    timer.expires_from_now(boost::posix_time::seconds(timeout)); //timer configurable
+    ec = error::would_block;    //para cotrolar los errores
+    timer.expires_from_now(boost::posix_time::seconds(timeout)); //timer 
 
-    timer.async_wait(boost::bind(onTimeout, boost::placeholders::_1, boost::ref(serial), boost::ref(running)));  //uso bind para enlazar onTimeout con el timer. así si se llega al timeout, la función cancela la lectura
+    timer.async_wait(boost::bind(onTimeout, boost::placeholders::_1, boost::ref(serial), boost::ref(running)));  //si se llega al timeout, la función cancela la lectura
 
-    serial.async_read_some(boost::asio::buffer(buffer, buffer_size), boost::bind(onRead, boost::placeholders::_1, boost::placeholders::_2, boost::ref(ec), boost::ref(length)));  //la funcion onRead se llama cuando la lectura termine
+    serial.async_read_some(boost::asio::buffer(buffer, buffer_size), boost::bind(onRead, boost::placeholders::_1, boost::placeholders::_2, boost::ref(ec), boost::ref(length)));  // se llama cuando la lectura termine
 
-    // Ejecuta la operación asíncrona en un bucle hasta que termine o se alcance el timeout
+    //la lectura asincronica ocurre hasta que haya una lectura o se acabe el tiempo
     do 
     {
-        io.run_one();   //ejecutar solo una operación asíncrona a la vez
-    }while (ec == boost::asio::error::would_block && running);  //ec cambia de valor cuando termina una lectura o finaliza el timeout
+        io.run_one(); 
+    }while (ec == boost::asio::error::would_block && running); //se repite mientras no hayan errores y no hubieron lecturas erroneas antes
 
-    timer.cancel();     //cancela el timeout
-    return !ec;  //devuelve true si la lectura es existosa
+    timer.cancel();     //eliminamos el timer utilizado, oa
+    return !ec;  //devuelve true si hubo una lectura con normalidad
 }
