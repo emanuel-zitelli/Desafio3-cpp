@@ -14,6 +14,16 @@ struct Estados
     bool apagado=false;
 };
 
+enum class Comandos
+{
+    start,
+    stop,
+    shutdown,
+    status,
+    handshake,
+    noReconocido
+};
+
 
 void start(Estados* estado, serial_port* serial);
 void status(Estados* estado, serial_port* serial);
@@ -25,5 +35,8 @@ void onTimeout(const boost::system::error_code& error, serial_port& serial, bool
 void onRead(const boost::system::error_code& error, size_t len, boost::system::error_code& ec, size_t& length);
 bool leerConTimeout(serial_port& serial, deadline_timer &timer, io_context &io, char* buffer, size_t buffer_size, boost::system::error_code& ec, int& timeout, bool& running, size_t& length);
 
+//proceso de comandos utilizando switch
+Comandos textoAComando(char* read_buf);
+void procesarComando(char* read_buf,size_t& length, Estados& stateMachine, serial_port& serial, bool& running);
 
 #endif //MAINHEADER_HPP

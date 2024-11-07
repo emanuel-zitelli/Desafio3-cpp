@@ -15,7 +15,7 @@ int main()
     std::string comando; 
     boost::system::error_code error;
     //condiciones de los bucles
-    bool running=false, handshake=false, datosIncorrectos=true;
+    bool running=false, handshake, datosIncorrectos=true;
 
     //para establecer el leer con timer
     boost::system::error_code ec = error::would_block;  //errorcode se inicializa con would_block 
@@ -85,7 +85,6 @@ int main()
             if (leerConTimeout(serial, timer, io, read_buf, sizeof(read_buf), ec, timeoutHandshake, handshake, length))
             {
                 std::cout << "Conexion establecida con el servidor\n";
-                handshake = true;
                 running = true;
             }
             else
@@ -111,7 +110,7 @@ int main()
                 else
                 {   intentos++;
                     std::cout << "Sin respuesta del servidor. Hay que reestablecer la conexion. Intentos: " << intentos << "\n";
-                    handshake=false;
+                    running=false; //el handshake tiene que volver a habilitar el envio de comandos
                 }
                     
             }

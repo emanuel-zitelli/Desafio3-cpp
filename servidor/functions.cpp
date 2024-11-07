@@ -105,3 +105,74 @@ bool leerConTimeout(serial_port& serial, deadline_timer &timer, io_context &io, 
     timer.cancel();     //eliminamos el timer utilizado, oa
     return !ec;  //devuelve true si hubo una lectura con normalidad
 }
+
+//textoAComando lee el input del usuario carga la variable comando, que es de tipo enum
+Comandos textoAComando(char* read_buf, size_t& length)
+{
+    Comandos comando =  ((std::string(read_buf,length) == "handshake") ? Comandos::handshake : 
+                        (std::string(read_buf, length) == "status") ? Comandos::status :
+                        (std::string(read_buf, length) == "start") ? Comandos::start :
+                        (std::string(read_buf, length) == "stop") ? Comandos::stop : 
+                        (std::string(read_buf, length) == "shutdown") ? Comandos::shutdown : Comandos::noReconocido);
+
+return comando;         
+}
+
+//procesarComando se encarga de evaluar el input del usuario y actuar en consecuencia
+void procesarComando(char* read_buf,size_t& length, Estados& stateMachine, serial_port& serial, bool& running)
+{
+    Comandos comando=textoAComando(read_buf, length); //switch solo acepta ints o enumeraciones, entonces hay que pasar de texto a enum
+    switch (comando)
+                {
+                    case Comandos::start:
+                        start(&stateMachine, &serial);
+                        break;
+
+                    case Comandos::stop:
+                        stop(&stateMachine, &serial);
+                        break;
+
+                    case Comandos::shutdown:
+                        write(serial, buffer("shutdown"));
+                        running = shutdown(&stateMachine, &serial);
+                        break;
+
+                    case Comandos::status:
+                        status(&stateMachine, &serial);
+                        break;
+
+                    case Comandos::handshake:
+                        write(serial, buffer("Conexion Cliente-Servidor establecida"));
+                        std::cout << "Servidor conectado con el cliente";
+                        break;
+
+                    default:
+                        write(serial, buffer("Comando no reconocido"));
+                }
+}
+/* 
+implementacion vieja del analisis de comandos. Lo dejo para que se vea la diferencia de legibilidad entre ifs anidados y el uso de switch
+                
+                if(std::string(read_buf, length) == "handshake")
+                {
+                    write(serial, buffer("Conexion Cliente-Servidor establecida"));
+                    std::cout << "Servidor conectado con el cliente";
+                }
+
+                else if (std::string(read_buf, length) == "status")
+                    status(&stateMachine, &serial);
+
+                else if (std::string(read_buf, length) == "start")
+                    start(&stateMachine, &serial);
+
+                else if (std::string(read_buf, length) == "stop")
+                    stop(&stateMachine, &serial);
+
+                else if (std::string(read_buf, length) == "shutdown")
+                {
+                    write(serial, buffer("shutdown"));
+                    running = shutdown(&stateMachine, &serial);
+                }
+                else
+                    write(serial, buffer("Comando no reconocido"));
+                */

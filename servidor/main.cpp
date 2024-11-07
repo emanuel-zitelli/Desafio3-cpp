@@ -25,9 +25,8 @@ int main()
         std::cout << "Servidor iniciado, esperando comandos. Shutdown establecido dentro de " 
         << timeout 
         << " segundos de inactividad" << std::endl;
-
         
-
+        
         while (running)
         {
             if (leerConTimeout(serial, timer, io, read_buf, sizeof(read_buf), ec, timeout, running, length)) 
@@ -35,27 +34,10 @@ int main()
                 if (error)
                     std::cerr << "Error de lectura: " << error.message() << std::endl;
                 else
+                {
                     std::cout << "Recibido: " << std::string(read_buf, length) << std::endl; // string(read_buf, len) devuelve el string recibido
-
-
-                if(std::string(read_buf, length) == "handshake")
-                {
-                    write(serial, buffer("Conexion Cliente-Servidor establecida"));
-                    std::cout << "Servidor conectado con el cliente";
+                    procesarComando(read_buf, length, stateMachine, serial, running); //
                 }
-                else if (std::string(read_buf, length) == "status")
-                    status(&stateMachine, &serial);
-                else if (std::string(read_buf, length) == "start")
-                    start(&stateMachine, &serial);
-                else if (std::string(read_buf, length) == "stop")
-                    stop(&stateMachine, &serial);
-                else if (std::string(read_buf, length) == "shutdown")
-                {
-                    write(serial, buffer("shutdown"));
-                    running = shutdown(&stateMachine, &serial);
-                }
-                else
-                    write(serial, buffer("Comando no reconocido"));
             }
             else
                 {
@@ -66,7 +48,7 @@ int main()
     }   
     catch (boost::system::system_error& e) //para capturar errores relacionados con la inicializacion
     {
-        std::cerr << "Falla al Establecer Conexion: " << e.what() << std::endl; //
+        std::cerr << "Falla al Establecer Conexion: " << e.what() << std::endl; 
     } catch (...) {
         std::cerr << "Error desconocido" << std::endl;
     }
